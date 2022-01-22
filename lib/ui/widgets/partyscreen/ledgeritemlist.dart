@@ -17,7 +17,7 @@ class _LedgerItemListState extends State<LedgerItemList> {
 TextEditingController editingController = TextEditingController();
 
   List<LedgerItem> ledgerItemData;
-  List<LedgerItem> ledgerItemDataforDisplay= List<LedgerItem>();
+  List<LedgerItem> ledgerItemDataforDisplay= [];
 
   @override
   void initState() {
@@ -28,10 +28,10 @@ TextEditingController editingController = TextEditingController();
   }
 
   void filterSearchResults(String query) {
-    List<LedgerItem> dummySearchList = List<LedgerItem>();
+    List<LedgerItem> dummySearchList = [];
     dummySearchList.addAll(ledgerItemData);
     if (query.isNotEmpty) {
-      List<LedgerItem> dummyListData = List<LedgerItem>();
+      List<LedgerItem> dummyListData = [];
       dummySearchList.forEach((item) {
         if (item.name.toLowerCase().contains(query)) {
           dummyListData.add(item);

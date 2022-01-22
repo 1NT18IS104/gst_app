@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -19,10 +20,13 @@ import 'package:tassist/route_generator.dart';
 import 'package:tassist/theme/texts.dart';
 import 'core/models/company.dart';
 import 'core/models/ledger.dart';
+import 'core/models/myuser.dart';
 import 'core/services/companyservice.dart';
 import 'core/services/ledgerservice.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 

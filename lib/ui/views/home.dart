@@ -308,7 +308,7 @@ class _DashboardCardState
     final snapshot = Provider.of<DocumentSnapshot>(context);
     var userDocument;
     if (widget.timePeriod == 'Everything') {
-      userDocument = snapshot?.data;
+      userDocument = snapshot?.data();
     } else {
       userDocument = snapshot[widget.timePeriod];
     }
@@ -427,7 +427,7 @@ class _DashboardCard2State
     final snapshot = Provider.of<DocumentSnapshot>(context);
     var userDocument;
     if (widget.timePeriod == 'Everything') {
-      userDocument = snapshot?.data;
+      userDocument = snapshot?.data();
     } else {
       userDocument = snapshot[widget.timePeriod];
     }
@@ -550,7 +550,7 @@ class _DashboardCard3State
     final snapshot = Provider.of<DocumentSnapshot>(context);
     var userDocument;
     if (widget.timePeriod == 'Everything') {
-      userDocument = snapshot?.data;
+      userDocument = snapshot?.data();
     } else {
       userDocument = snapshot[widget.timePeriod];
     }

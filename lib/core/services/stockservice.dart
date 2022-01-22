@@ -60,3 +60,4 @@ class StockItemService {
     }).toList();
   }
 }
+

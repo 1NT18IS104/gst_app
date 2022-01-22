@@ -1,13 +1,16 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:tassist/core/models/company.dart';
 import 'package:tassist/core/models/ledger.dart';
 import 'package:tassist/core/models/stockitem.dart';
@@ -59,6 +62,7 @@ class _LedgerInputScreenState extends State<LedgerInputScreen> {
   String _dueDate = DateFormat('dd-MM-yyyy')
       .format(DateTime.now().add(new Duration(days: 30)));
   bool isCashSwitched = true;
+  var ledgerList;
   //      final List<String> discountPerCent = ['5','10', '15', '20'];
   // TODO due date to be changed as per credit period.
 
@@ -76,12 +80,16 @@ class _LedgerInputScreenState extends State<LedgerInputScreen> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     var uid = Provider.of<User>(context).uid;
-    var ledgerList = Provider.of<List<LedgerItem>>(context, listen: false);
-    var stockList = Provider.of<List<StockItem>>(context, listen: false);
+    //var ledgerList = Provider.of<List<LedgerItem>>(context, listen: false);
+    //var stockList = Provider.of<List<StockItem>>(context, listen: false);
     var company = Provider.of<Company>(context);
+
+    // print("Hello like Shirley");
+    // print(ledgerList);
 
     return WillPopScope(
         onWillPop: () async => false,
@@ -191,51 +199,62 @@ class _LedgerInputScreenState extends State<LedgerInputScreen> {
                 ),
                 Padding(
                   padding: spacer.x.xxs,
-                  child: Container(
-                    // width: MediaQuery.of(context).size.width / 1.2,
-                    child: Padding(
-                      padding: spacer.x.xxs,
-                      child: Center(
-                        child: DropdownButtonFormField(
-                          // value: _customerName,
-                          isExpanded: true,
-                          items: ledgerList.map((l) {
-                            return DropdownMenuItem(
-                              child: Text(l.name),
-                              value: l,
-                            );
-                          }).toList(),
-                          style: secondaryListDisc,
-                          decoration: InputDecoration(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance.collection("company").doc().collection("ledger").snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData)
+                        return Center(
+                          child: CupertinoActivityIndicator(),
+                        );
+                      return Container(
+                        // width: MediaQuery.of(context).size.width / 1.2,
+                        child: Padding(
+                          padding: spacer.x.xxs,
+                          child: Center(
+                              child: Expanded(
+                                child: DropdownButtonFormField(
+                                // value: _customerName,
+                                isExpanded: true,
+                                items: snapshot.data.docs.map((l) {
+                                  return DropdownMenuItem(
+                                    child: Text(l["name"]),
+                                    value: l,
+                                  );
+                                }).toList(),
+                                style: secondaryListDisc,
+                                decoration: InputDecoration(
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white),
+                                  ),
+                                  icon: Icon(
+                                    Icons.person,
+                                    color: TassistPrimary,
+                                    size: 20,
+                                  ),
+                                  hintText: 'Select customer',
+                                  hintStyle: secondaryHint,
+                                  labelText: 'Customer name',
+                                  labelStyle:
+                                      secondaryListTitle.copyWith(fontSize: 16),
+                                ),
+                                onChanged: (val) {
+                                  setState(() {
+                                    _customerLedger = val;
+                                    _customerMasterId = val.masterId;
+                                    _customerName = val.name;
+                                    _customerGst = (val.gst ?? '');
+                                    _customerPhone = (val.phone ?? '');
+                                  });
+                                },
                             ),
-                            icon: Icon(
-                              Icons.person,
-                              color: TassistPrimary,
-                              size: 20,
-                            ),
-                            hintText: 'Select customer',
-                            hintStyle: secondaryHint,
-                            labelText: 'Customer name',
-                            labelStyle:
-                                secondaryListTitle.copyWith(fontSize: 16),
+                              ),
                           ),
-                          onChanged: (val) {
-                            setState(() {
-                              _customerLedger = val;
-                              _customerMasterId = val.masterId;
-                              _customerName = val.name;
-                              _customerGst = (val.gst ?? '');
-                              _customerPhone = (val.phone ?? '');
-                            });
-                          },
                         ),
-                      ),
-                    ),
-                    // decoration: BoxDecoration(
-                    //     borderRadius: BorderRadius.all(Radius.circular(8)),
-                    //     color: TassistBgLightPurple)
+                        // decoration: BoxDecoration(
+                        //     borderRadius: BorderRadius.all(Radius.circular(8)),
+                        //     color: TassistBgLightPurple)
+                      );
+                    }
                   ),
                 ),
                 // Padding(
@@ -280,39 +299,50 @@ class _LedgerInputScreenState extends State<LedgerInputScreen> {
                     children: <Widget>[
                       Flexible(
                         flex: 4,
-                        child: Container(
-                          child: DropdownButtonFormField(
-                            // value: _productName,
-                            isExpanded: true,
-                            items: stockList.map((p) {
-                              return DropdownMenuItem(
-                                child: Text(p.name),
-                                value: p,
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance.collection("company").doc().collection("stockitem").snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData)
+                              return Center(
+                                child: CupertinoActivityIndicator(),
                               );
-                            }).toList(),
-                            style: secondaryListDisc,
-                            decoration: InputDecoration(
-                                icon: Icon(
-                                  Icons.playlist_add,
-                                  color: TassistPrimary,
+                            return Container(
+                              child: Expanded(
+                                child: DropdownButtonFormField(
+                                  // value: _productName,
+                                  isExpanded: true,
+                                  items: snapshot.data.docs.map((p) {
+                                    return DropdownMenuItem(
+                                      child: Text(p["name"]),
+                                      value: p,
+                                    );
+                                  }).toList(),
+                                  style: secondaryListDisc,
+                                  decoration: InputDecoration(
+                                      icon: Icon(
+                                        Icons.playlist_add,
+                                        color: TassistPrimary,
+                                      ),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide: BorderSide(color: Colors.white),
+                                      ),
+                                      isDense: true,
+                                      hintText: 'Add product',
+                                      hintStyle: secondaryHint,
+                                      labelText: 'Add Product(s)',
+                                      labelStyle:
+                                          secondaryListTitle.copyWith(fontSize: 16)),
+                                  onChanged: (val) =>
+                                      setState(() => _productName = val.name),
                                 ),
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                isDense: true,
-                                hintText: 'Add product',
-                                hintStyle: secondaryHint,
-                                labelText: 'Add Product(s)',
-                                labelStyle:
-                                    secondaryListTitle.copyWith(fontSize: 16)),
-                            onChanged: (val) =>
-                                setState(() => _productName = val.name),
-                          ),
-                          // decoration: BoxDecoration(
-                          //     border: Border.all(color: TassistPrimary),
-                          //     borderRadius:
-                          //         BorderRadius.all(Radius.circular(8)),
-                          //     color: TassistBgLightPurple)
+                              ),
+                              // decoration: BoxDecoration(
+                              //     border: Border.all(color: TassistPrimary),
+                              //     borderRadius:
+                              //         BorderRadius.all(Radius.circular(8)),
+                              //     color: TassistBgLightPurple)
+                            );
+                          }
                         ),
                       ),
                       SizedBox(width: 10),
@@ -749,8 +779,11 @@ class PdfViewerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PDFViewerScaffold(
-      path: path,
+    // return PDFViewerScaffold(
+    //   path: path,
+    // );
+    return Scaffold(
+      body: SfPdfViewer.asset(path),
     );
   }
 }

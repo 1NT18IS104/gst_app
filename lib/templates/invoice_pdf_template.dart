@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
-
 createInvoicePdf({
   String companyName,
   String companyAddress,
@@ -21,16 +20,19 @@ createInvoicePdf({
 }) {
   final pdf = Document();
 
+  // PdfImage(
+  //   pdf.document,
+  //   image: File(logoPath).readAsBytesSync(),
+  //   width: 40,
+  //   height: 40,
+  // );
+
   Center logoImage;
   if (logoPath != null) {
     logoImage = Center(
       child: Image(
-        PdfImage(
-          pdf.document,
-          image: File(logoPath).readAsBytesSync(),
-          width: 40,
-          height: 40,
-        ),
+       MemoryImage(File(logoPath).readAsBytesSync()),
+          fit: BoxFit.contain
       ),
     );
   } else {
@@ -46,13 +48,19 @@ createInvoicePdf({
         if (context.pageNumber == 1) {
           return null;
         }
+
         return Container(
             alignment: Alignment.topLeft,
             margin: const EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
             padding: const EdgeInsets.only(bottom: 3.0 * PdfPageFormat.mm),
             decoration: const BoxDecoration(
-                border:
-                    BoxBorder(bottom: true, width: 0.5, color: PdfColors.grey)),
+                border:Border(
+                    bottom: BorderSide(
+                        color: PdfColors.grey, width: 0.5, style: BorderStyle.solid
+                    )
+                )
+            ),
+            //BoxBorder(bottom: true, width: 0.5, color: PdfColors.grey)),
             child: Text('TallyAssist',
                 style: Theme.of(context)
                     .defaultTextStyle
@@ -79,11 +87,21 @@ createInvoicePdf({
           level: 0,
           child: Container(
             decoration: BoxDecoration(
-              border: BoxBorder(
-                bottom: true,
-                top: true,
-              ),
+              border: Border(
+                  bottom: BorderSide(
+                     width: 0.5, style: BorderStyle.solid
+                  ),
+                top: BorderSide(
+                    width: 0.5, style: BorderStyle.solid
+                ),
+              )
             ),
+
+            //   BoxBorder(
+            //     bottom: true,
+            //     top: true,
+            //   ),
+            // ),
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -205,13 +223,14 @@ createInvoicePdf({
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  border: BoxBorder(
-                      top: true,
-                      left: true,
-                      right: true,
-                      bottom: true,
-                      color: PdfColors.grey400),
-                ),
+                  border:Border.all(color: PdfColors.grey400)),
+                //   BoxBorder(
+                //       top: true,
+                //       left: true,
+                //       right: true,
+                //       bottom: true,
+                //       color: PdfColors.grey400),
+                // ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -238,13 +257,14 @@ gridChild(String text1, String text2) {
     padding: const EdgeInsets.only(left: 2.0 * PdfPageFormat.mm),
     alignment: Alignment.centerLeft,
     decoration: BoxDecoration(
-      border: BoxBorder(
-          left: true,
-          right: true,
-          top: true,
-          bottom: true,
-          color: PdfColors.grey400),
-    ),
+      border: Border.all(color: PdfColors.grey400)),
+    //   BoxBorder(
+    //       left: true,
+    //       right: true,
+    //       top: true,
+    //       bottom: true,
+    //       color: PdfColors.grey400),
+    // ),
     child: Column(
       children: <Widget>[
         Text(text1),

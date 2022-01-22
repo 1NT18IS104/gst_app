@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:tassist/core/models/company.dart';
 import 'package:tassist/core/models/ledger.dart';
 // import 'package:tassist/core/models/ledgervoucher.dart';
@@ -274,8 +275,11 @@ class PdfViewerPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PDFViewerScaffold(
-      path: path,
+    // return PDFViewerScaffold(
+    //   path: path,
+    // );
+    return Scaffold(
+      body: SfPdfViewer.asset(path),
     );
   }
 }
